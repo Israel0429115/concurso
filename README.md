@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FullStack Project - Node.js + Angular + shadcn/ui
 
 A full-stack application with Node.js/Express backend and Angular frontend with shadcn/ui components.
@@ -107,3 +108,7 @@ Make sure your `components.json` is configured correctly for shadcn/ui.
 - `DATABASE_URL` - Database connection string
 - `JWT_SECRET` - JWT secret key
 - `API_URL` - API base URL
+=======
+# concurso
+concurso
+>>>>>>> 6b5086e4ae02d30e16bb97ce9444759cc07ae83f
