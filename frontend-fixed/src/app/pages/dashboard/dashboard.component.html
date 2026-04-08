@@ -1,0 +1,248 @@
+<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <!-- Hero Section -->
+  <section class="mb-8 rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-blue-900 p-8 text-white shadow-2xl">
+    <div class="flex items-start justify-between gap-6">
+      <div class="flex-1">
+        <div class="mb-3 flex items-center gap-2">
+          <svg class="h-5 w-5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span class="text-sm font-semibold uppercase tracking-wider text-blue-200">Sistema de Alerta Temprana</span>
+        </div>
+        <h1 class="max-w-3xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Predicción de Brotes de Dengue en Ecuador
+        </h1>
+        <p class="mt-3 max-w-2xl text-base text-blue-100">
+          Selecciona una provincia y semana epidemiológica para obtener predicciones de riesgo, casos esperados y factores de alerta.
+        </p>
+      </div>
+      <div class="hidden flex-shrink-0 items-center justify-center rounded-2xl bg-white/10 p-4 backdrop-blur-sm lg:flex">
+        <svg class="h-20 w-20 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <section class="grid gap-6 lg:grid-cols-[400px_1fr]">
+    <!-- Form Panel -->
+    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+      <div class="mb-6 flex items-center gap-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
+          <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Consultar Riesgo</h2>
+          <p class="text-sm text-slate-500">Selecciona provincia y semana</p>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+        <!-- Province Select -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-slate-700">Provincia</label>
+          <div class="relative">
+            <select 
+              formControlName="province" 
+              class="w-full appearance-none rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 pr-10 text-sm font-medium text-slate-900 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+            >
+              <option *ngFor="let province of provinces()" [value]="province">{{ province }}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week Input -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-slate-700">Semana Epidemiológica</label>
+          <div class="relative">
+            <input 
+              formControlName="week" 
+              type="number" 
+              min="1" 
+              max="52" 
+              class="w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+            />
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          [disabled]="loading() || loadingProvinces()"
+          class="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:shadow-xl hover:from-blue-700 hover:to-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <span class="relative z-10 flex items-center justify-center gap-2">
+            <svg *ngIf="loading()" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ loading() ? 'Consultando...' : 'Predecir Riesgo' }}
+          </span>
+          <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-blue-700 to-blue-900 transition-transform group-hover:translate-x-0"></div>
+        </button>
+      </form>
+
+      <!-- Error Message -->
+      <div *ngIf="error()" class="mt-5 flex items-start gap-3 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3">
+        <svg class="h-5 w-5 flex-shrink-0 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-sm font-medium text-red-700">{{ error() }}</p>
+      </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="space-y-6">
+      <!-- Summary Cards -->
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" *ngIf="summaryCards().length">
+        <article *ngFor="let card of summaryCards()" class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-md transition-all hover:shadow-xl">
+          <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 opacity-50 transition-all group-hover:scale-110"></div>
+          <p class="relative text-xs font-semibold uppercase tracking-wider text-slate-500">{{ card.label }}</p>
+          <p class="relative mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{{ card.value }}</p>
+          <p *ngIf="card.hint" class="relative mt-1 text-xs font-medium text-slate-600">{{ card.hint }}</p>
+        </article>
+      </div>
+
+      <!-- Chart and Results Grid -->
+      <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <!-- Chart Section -->
+        <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+          <div class="mb-6 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
+                <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-900">Evolución Semanal</h3>
+                <p class="text-sm text-slate-500">Casos registrados por semana</p>
+              </div>
+            </div>
+            <span *ngIf="prediction()" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold shadow-lg" [ngClass]="riskBadgeClass()">
+              <span class="h-2 w-2 rounded-full bg-white"></span>
+              {{ prediction()?.riskLevel | uppercase }}
+            </span>
+          </div>
+
+          <!-- Bar Chart -->
+          <div class="flex h-64 items-end gap-1.5 rounded-2xl bg-gradient-to-t from-slate-50 to-white p-5 ring-1 ring-slate-100">
+            <div *ngFor="let bar of chartBars()" class="group relative flex flex-1 flex-col items-center justify-end">
+              <div class="absolute bottom-full mb-2 hidden rounded-lg bg-slate-800 px-3 py-2 text-xs text-white opacity-0 shadow-xl transition-all group-hover:block group-hover:opacity-100">
+                <p class="font-semibold">SE {{ bar.week }}</p>
+                <p class="text-slate-300">{{ bar.cases }} casos</p>
+                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 transform border-4 border-transparent border-t-slate-800"></div>
+              </div>
+              <div
+                class="w-full rounded-t-lg transition-all duration-300 hover:opacity-80"
+                [class.bg-gradient-to-t]="!bar.active"
+                [class.from-blue-400]="!bar.active"
+                [class.to-blue-500]="!bar.active"
+                [class]="bar.active ? 'bg-gradient-to-t ' + riskColorBar() : ''"
+                [style.height]="bar.height"
+              ></div>
+              <span class="mt-2 text-[10px] font-medium text-slate-500">{{ bar.week }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Prediction Details -->
+        <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+          <div class="mb-5 flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
+              <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Resultado</h3>
+          </div>
+
+          <ng-container *ngIf="prediction() as result; else emptyState">
+            <!-- Risk Level Card -->
+            <div class="mb-5 overflow-hidden rounded-2xl shadow-lg"
+              [ngClass]="{
+                'bg-gradient-to-br from-red-500 to-red-600': result.riskLevel === 'alto',
+                'bg-gradient-to-br from-amber-500 to-amber-600': result.riskLevel === 'medio',
+                'bg-gradient-to-br from-emerald-500 to-emerald-600': result.riskLevel === 'bajo'
+              }">
+              <div class="p-6 text-white">
+                <p class="text-sm font-medium opacity-90">Provincia</p>
+                <p class="mt-1 text-2xl font-extrabold tracking-tight">{{ result.province }}</p>
+                <div class="mt-4 flex items-end justify-between">
+                  <div>
+                    <p class="text-sm font-medium opacity-90">Semana</p>
+                    <p class="mt-1 text-lg font-bold">SE {{ result.epiWeek }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-medium opacity-90">Puntaje</p>
+                    <p class="mt-1 text-3xl font-extrabold">{{ result.riskScore * 100 | number:'1.0-0' }}/100</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Factors -->
+            <div class="mb-5">
+              <h4 class="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-700">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Factores Principales
+              </h4>
+              <ul class="space-y-2">
+                <li *ngFor="let factor of result.topFactors; let i = index" class="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-700 shadow-sm ring-1 ring-slate-100">
+                  <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">{{ i + 1 }}</span>
+                  <span class="font-medium">{{ factor }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Weather Data -->
+            <div *ngIf="result.record" class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 p-4 ring-1 ring-orange-200">
+                <div class="flex items-center gap-2">
+                  <svg class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <p class="text-xs font-bold uppercase tracking-wider text-orange-700">Temperatura</p>
+                </div>
+                <p class="mt-2 text-2xl font-extrabold text-orange-900">{{ result.record.temp_mean_c_synthetic }}°C</p>
+              </div>
+              <div class="rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-4 ring-1 ring-blue-200">
+                <div class="flex items-center gap-2">
+                  <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                  </svg>
+                  <p class="text-xs font-bold uppercase tracking-wider text-blue-700">Precipitación</p>
+                </div>
+                <p class="mt-2 text-2xl font-extrabold text-blue-900">{{ result.record.precip_mm_synthetic }} mm</p>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #emptyState>
+            <div class="flex flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-8 text-center">
+              <svg class="mb-3 h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-sm font-medium text-slate-500">Ejecuta una consulta para ver el resultado</p>
+            </div>
+          </ng-template>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>

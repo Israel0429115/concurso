@@ -1,0 +1,245 @@
+<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <!-- Header -->
+  <section class="mb-8 rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 text-white shadow-2xl">
+    <div class="flex items-start justify-between gap-6">
+      <div class="flex-1">
+        <div class="mb-3 flex items-center gap-2">
+          <svg class="h-5 w-5 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-sm font-semibold uppercase tracking-wider text-purple-200">Análisis Histórico</span>
+        </div>
+        <h1 class="max-w-3xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Historial Provincial de Dengue
+        </h1>
+        <p class="mt-3 max-w-2xl text-base text-purple-100">
+          Visualiza datos históricos, tendencias y patrones de riesgo por provincia.
+        </p>
+      </div>
+      <div class="hidden flex-shrink-0 items-center justify-center rounded-2xl bg-white/10 p-4 backdrop-blur-sm lg:flex">
+        <svg class="h-20 w-20 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Province Selector -->
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100">
+        <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-slate-900">Seleccionar Provincia</h2>
+        <p class="text-sm text-slate-500">Filtra los datos históricos</p>
+      </div>
+    </div>
+
+    <div class="w-full max-w-xs">
+      <div class="relative">
+        <select 
+          [formControl]="provinceControl" 
+          class="w-full appearance-none rounded-xl border-2 border-slate-200 bg-white px-4 py-3 pr-10 text-sm font-semibold text-slate-900 outline-none transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
+        >
+          <option *ngFor="let province of provinces()" [value]="province">{{ province }}</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+          <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="grid gap-6 lg:grid-cols-[1fr_380px]">
+    <!-- Data Table -->
+    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+      <!-- Loading State -->
+      <div *ngIf="loading()" class="flex items-center justify-center p-12">
+        <svg class="h-10 w-10 animate-spin text-purple-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!loading() && rows().length > 0" class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead class="bg-gradient-to-r from-slate-50 to-slate-100">
+            <tr>
+              <th class="px-6 py-4 font-bold text-slate-700">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Semana
+                </div>
+              </th>
+              <th class="px-6 py-4 font-bold text-slate-700">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                  Casos
+                </div>
+              </th>
+              <th class="px-6 py-4 font-bold text-slate-700">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  Temperatura
+                </div>
+              </th>
+              <th class="px-6 py-4 font-bold text-slate-700">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                  </svg>
+                  Precipitación
+                </div>
+              </th>
+              <th class="px-6 py-4 font-bold text-slate-700">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Nivel de Riesgo
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let row of rows(); let i = index" 
+                class="transition-all hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:shadow-sm">
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-bold text-slate-700">
+                  SE {{ row.epi_week }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="h-2 rounded-full bg-purple-500" [style.width]="(row.cases / maxCases()) * 100 + '%'"></div>
+                  <span class="font-bold text-slate-900">{{ row.cases }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span class="font-medium text-slate-700">{{ row.temp_mean_c_synthetic }}°C</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                  </svg>
+                  <span class="font-medium text-slate-700">{{ row.precip_mm_synthetic }} mm</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold shadow-lg"
+                  [ngClass]="riskBadgeClass(row.risk_level_rule_based)">
+                  <span class="h-1.5 w-1.5 rounded-full bg-white"></span>
+                  {{ row.risk_level_rule_based | uppercase }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading() && rows().length === 0" class="flex flex-col items-center justify-center p-12 text-center">
+        <svg class="mb-4 h-20 w-20 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p class="text-lg font-semibold text-slate-700">No hay datos disponibles</p>
+        <p class="mt-1 text-sm text-slate-500">Selecciona otra provincia para ver su historial</p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="space-y-5">
+      <!-- Stats Cards -->
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+        <!-- Weeks Count -->
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white shadow-lg">
+          <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 transition-all group-hover:scale-110"></div>
+          <div class="relative">
+            <div class="mb-3 flex items-center gap-2">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p class="text-sm font-semibold uppercase tracking-wider text-purple-200">Semanas Cargadas</p>
+            </div>
+            <p class="text-4xl font-extrabold">{{ rows().length }}</p>
+            <p class="mt-1 text-sm text-purple-200">Registros históricos</p>
+          </div>
+        </div>
+
+        <!-- Max Cases -->
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-pink-500 to-pink-600 p-6 text-white shadow-lg">
+          <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 transition-all group-hover:scale-110"></div>
+          <div class="relative">
+            <div class="mb-3 flex items-center gap-2">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <p class="text-sm font-semibold uppercase tracking-wider text-pink-200">Máximo de Casos</p>
+            </div>
+            <p class="text-4xl font-extrabold">{{ maxCases() }}</p>
+            <p class="mt-1 text-sm text-pink-200">Pico histórico</p>
+          </div>
+        </div>
+
+        <!-- Average Cases -->
+        <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 text-white shadow-lg">
+          <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 transition-all group-hover:scale-110"></div>
+          <div class="relative">
+            <div class="mb-3 flex items-center gap-2">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <p class="text-sm font-semibold uppercase tracking-wider text-indigo-200">Promedio Semanal</p>
+            </div>
+            <p class="text-4xl font-extrabold">{{ avgCases() }}</p>
+            <p class="mt-1 text-sm text-indigo-200">Casos por semana</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6 shadow-md">
+        <div class="mb-4 flex items-center gap-2">
+          <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Información</h3>
+        </div>
+        <ul class="space-y-3">
+          <li class="flex items-start gap-2 rounded-xl bg-white p-3 text-sm text-slate-700 shadow-sm ring-1 ring-slate-200">
+            <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-xs font-bold text-purple-600">1</span>
+            <span class="font-medium">Datos históricos directos del backend</span>
+          </li>
+          <li class="flex items-start gap-2 rounded-xl bg-white p-3 text-sm text-slate-700 shadow-sm ring-1 ring-slate-200">
+            <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-xs font-bold text-purple-600">2</span>
+            <span class="font-medium">Trazabilidad completa de datos</span>
+          </li>
+          <li class="flex items-start gap-2 rounded-xl bg-white p-3 text-sm text-slate-700 shadow-sm ring-1 ring-slate-200">
+            <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-xs font-bold text-purple-600">3</span>
+            <span class="font-medium">Filtros por año disponibles próximamente</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </section>
+</main>
