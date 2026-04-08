@@ -6,6 +6,7 @@ import {
   getHighRiskProvinces,
 } from "../services/dengue-data.service";
 import { predictProvinceWeek, predictMultipleProvinces } from "../services/prediction.service";
+import { predictWithML, getModelMetrics } from "../services/ml-prediction.service";
 
 export async function listProvinces(req: Request, res: Response) {
   try {
@@ -44,8 +45,23 @@ export async function getPrediction(req: Request, res: Response) {
       return res.status(400).json({ message: "week debe ser numérico" });
     }
 
+    // Intentar primero con modelo ML
+    const mlPrediction = await predictWithML(province, week);
+    
+    if (mlPrediction) {
+      // Usar predicción del modelo ML
+      return res.json({
+        ...mlPrediction,
+        modelUsed: 'ML-RandomForest',
+      });
+    }
+    
+    // Fallback a modelo rule-based si ML no está disponible
     const prediction = await predictProvinceWeek(province, week);
-    return res.json(prediction);
+    return res.json({
+      ...prediction,
+      modelUsed: 'Rule-Based',
+    });
   } catch (error) {
     return res.status(500).json({ message: "Error al generar predicción" });
   }
@@ -63,14 +79,55 @@ export async function getBatchPrediction(req: Request, res: Response) {
       return res.status(400).json({ message: "week debe ser numérico" });
     }
 
-    const predictions = await predictMultipleProvinces(provinces, week);
-    return res.json({ 
+    // Intentar con ML para cada provincia
+    const predictions = await Promise.all(
+      provinces.map(async (province: string) => {
+        const mlPred = await predictWithML(province, week);
+        if (mlPred) {
+          return { ...mlPred, modelUsed: 'ML-RandomForest' };
+        }
+        const rulePred = await predictProvinceWeek(province, week);
+        return { ...rulePred, modelUsed: 'Rule-Based' };
+      })
+    );
+
+    // Ordenar por riskScore descendente
+    predictions.sort((a, b) => b.riskScore - a.riskScore);
+
+    return res.json({
       week,
       totalPredictions: predictions.length,
-      predictions 
+      predictions
     });
   } catch (error) {
     return res.status(500).json({ message: "Error al generar predicciones batch" });
+  }
+}
+
+export async function getMLMetrics(req: Request, res: Response) {
+  try {
+    const metrics = await getModelMetrics();
+    
+    if (!metrics) {
+      return res.status(404).json({ 
+        message: "No hay modelo ML entrenado. Ejecuta: npm run train-model" 
+      });
+    }
+
+    return res.json({
+      modelType: metrics.modelType,
+      metrics: {
+        accuracy: metrics.accuracy,
+        macroPrecision: metrics.macroPrecision,
+        macroRecall: metrics.macroRecall,
+        macroF1: metrics.macroF1,
+      },
+      confusionMatrix: metrics.confusionMatrix,
+      featureImportance: metrics.featureImportance,
+      perClassMetrics: metrics.perClassMetrics,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error al obtener métricas del modelo ML" });
   }
 }
 

@@ -128,7 +128,7 @@ export async function getNationalWeeklyStats(): Promise<{
 
 export async function getHighRiskProvinces(epiWeek: number): Promise<string[]> {
   const data = await loadDengueData();
-  const weekData = data.filter(row => row.epi_week === epi_week && row.risk_level_rule_based === 'alto');
-  
+  const weekData = data.filter(row => row.epi_week === epiWeek && row.risk_level_rule_based === 'alto');
+
   return [...new Set(weekData.map(row => row.province))].sort();
 }

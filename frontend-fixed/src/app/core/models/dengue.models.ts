@@ -22,6 +22,24 @@ export interface PredictionResponse {
   expectedCases: number;
   topFactors: string[];
   record: DengueWeeklyRecord | null;
+  modelUsed?: 'ML-RandomForest' | 'Rule-Based';
+}
+
+export interface MLMetrics {
+  modelType: string;
+  metrics: {
+    accuracy: number;
+    macroPrecision: number;
+    macroRecall: number;
+    macroF1: number;
+  };
+  confusionMatrix: number[][];
+  featureImportance: Array<{ feature: string; importance: number }>;
+  perClassMetrics: {
+    bajo: { precision: number; recall: number; f1Score: number; support: number };
+    medio: { precision: number; recall: number; f1Score: number; support: number };
+    alto: { precision: number; recall: number; f1Score: number; support: number };
+  };
 }
 
 export interface HistoryResponse {

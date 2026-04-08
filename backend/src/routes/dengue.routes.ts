@@ -7,6 +7,7 @@ import {
   getNationalStatistics,
   getEpidemiologicalSummary,
   getProvinceStatistics,
+  getMLMetrics,
 } from "../controllers/dengue.controller";
 
 const router = Router();
@@ -22,6 +23,9 @@ router.get("/prediction", getPrediction);
 
 // Batch prediction (POST for multiple provinces)
 router.post("/prediction/batch", getBatchPrediction);
+
+// ML Model metrics
+router.get("/ml/metrics", getMLMetrics);
 
 // National statistics
 router.get("/statistics/national", getNationalStatistics);

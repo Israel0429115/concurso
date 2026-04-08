@@ -5,6 +5,7 @@ import compression from "compression";
 import morgan from "morgan";
 import { config } from "./config";
 import dengueRoutes from "./routes/dengue.routes";
+import { errorHandler, notFoundHandler } from "./middlewares/error.handler";
 
 const app: Application = express();
 
@@ -20,6 +21,12 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api", dengueRoutes);
+
+// 404 handler
+app.use(notFoundHandler);
+
+// Error handler (must be last)
+app.use(errorHandler);
 
 const PORT = config.port || 3001;
 

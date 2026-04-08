@@ -3,7 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { DengueApiService } from '../../core/services/dengue-api.service';
-import { DengueWeeklyRecord, PredictionResponse, SummaryCard } from '../../core/models/dengue.models';
+import { DengueWeeklyRecord, PredictionResponse, SummaryCard, MLMetrics } from '../../core/models/dengue.models';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit {
   readonly loading = signal(false);
   readonly loadingProvinces = signal(false);
   readonly error = signal<string | null>(null);
+  readonly mlMetrics = signal<MLMetrics | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     province: ['GUAYAS', Validators.required],
@@ -78,8 +79,80 @@ export class DashboardComponent implements OnInit {
     }));
   });
 
+  // ML Metrics helpers
+  readonly mlAccuracy = computed(() => {
+    const metrics = this.mlMetrics();
+    return metrics ? (metrics.metrics.accuracy * 100).toFixed(1) : 'N/A';
+  });
+
+  readonly mlF1Score = computed(() => {
+    const metrics = this.mlMetrics();
+    return metrics ? (metrics.metrics.macroF1 * 100).toFixed(1) : 'N/A';
+  });
+
+  readonly mlPrecision = computed(() => {
+    const metrics = this.mlMetrics();
+    return metrics ? (metrics.metrics.macroPrecision * 100).toFixed(1) : 'N/A';
+  });
+
+  readonly mlRecall = computed(() => {
+    const metrics = this.mlMetrics();
+    return metrics ? (metrics.metrics.macroRecall * 100).toFixed(1) : 'N/A';
+  });
+
+  readonly featureImportanceBars = computed(() => {
+    const metrics = this.mlMetrics();
+    if (!metrics || !metrics.featureImportance) return [];
+    
+    const maxImportance = Math.max(...metrics.featureImportance.map(f => f.importance));
+    
+    return metrics.featureImportance
+      .map((f, i) => ({
+        name: f.feature,
+        importance: f.importance,
+        percentage: (f.importance * 100).toFixed(1),
+        barWidth: (f.importance / maxImportance) * 100,
+        index: i + 1,
+      }))
+      .sort((a, b) => b.importance - a.importance);
+  });
+
+  readonly confusionMatrixData = computed(() => {
+    const metrics = this.mlMetrics();
+    if (!metrics || !metrics.confusionMatrix) return null;
+    
+    return {
+      matrix: metrics.confusionMatrix,
+      labels: ['Bajo', 'Medio', 'Alto'],
+    };
+  });
+
+  readonly mlPerClassData = computed(() => {
+    const metrics = this.mlMetrics();
+    if (!metrics || !metrics.perClassMetrics) return null;
+    
+    return [
+      { 
+        class: 'Bajo', 
+        ...metrics.perClassMetrics.bajo,
+        color: 'emerald',
+      },
+      { 
+        class: 'Medio', 
+        ...metrics.perClassMetrics.medio,
+        color: 'amber',
+      },
+      { 
+        class: 'Alto', 
+        ...metrics.perClassMetrics.alto,
+        color: 'red',
+      },
+    ];
+  });
+
   ngOnInit(): void {
     this.loadProvinces();
+    this.loadMLMetrics();
   }
 
   loadProvinces(): void {
@@ -98,6 +171,13 @@ export class DashboardComponent implements OnInit {
         },
         error: () => this.error.set('No se pudieron cargar las provincias.'),
       });
+  }
+
+  loadMLMetrics(): void {
+    this.api.getMLMetrics().subscribe({
+      next: (metrics) => this.mlMetrics.set(metrics),
+      error: () => console.warn('No se pudieron cargar las métricas del modelo ML'),
+    });
   }
 
   submit(): void {

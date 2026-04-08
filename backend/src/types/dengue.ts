@@ -28,6 +28,7 @@ export interface PredictionResponse {
   expectedCases: number;
   topFactors: string[];
   record: DengueWeeklyRecord | null;
+  modelUsed?: 'ML-RandomForest' | 'Rule-Based';
 }
 
 export interface ProvinceStats {

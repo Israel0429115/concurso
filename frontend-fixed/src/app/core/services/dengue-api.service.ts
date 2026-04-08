@@ -5,6 +5,7 @@ import {
   HistoryResponse,
   PredictionResponse,
   ProvincesResponse,
+  MLMetrics,
 } from '../models/dengue.models';
 import { environment } from '../../../environments/environment';
 
@@ -20,6 +21,10 @@ export class DengueApiService {
   getPrediction(province: string, week: number): Observable<PredictionResponse> {
     const params = new HttpParams().set('province', province).set('week', week);
     return this.http.get<PredictionResponse>(`${this.baseUrl}/prediction`, { params });
+  }
+
+  getMLMetrics(): Observable<MLMetrics> {
+    return this.http.get<MLMetrics>(`${this.baseUrl}/ml/metrics`);
   }
 
   getHistory(province: string): Observable<HistoryResponse> {
