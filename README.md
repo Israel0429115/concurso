@@ -1,114 +1,122 @@
-<<<<<<< HEAD
-# FullStack Project - Node.js + Angular + shadcn/ui
 
-A full-stack application with Node.js/Express backend and Angular frontend with shadcn/ui components.
+Sistema de alerta temprana basado en inteligencia artificial para predecir el riesgo de brotes de dengue a nivel provincial en Ecuador.
 
-## Project Structure
+---
 
-```
-consurso/
-├── backend/              # Node.js + Express + TypeScript
-│   ├── src/
-│   │   ├── config/      # Configuration files
-│   │   ├── controllers/ # Route controllers
-│   │   ├── middlewares/ # Custom middleware
-│   │   ├── models/      # Data models
-│   │   ├── routes/      # API routes
-│   │   ├── services/    # Business logic
-│   │   └── utils/       # Utility functions
-│   └── tests/           # Test files
+## Descripción
+
+Este proyecto implementa una plataforma web que combina datos epidemiológicos y variables climáticas para estimar el riesgo semanal de brote de dengue por provincia.
+
+La solución permite:
+
+- Predecir riesgo de brote (bajo, medio, alto)
+- Estimar probabilidad asociada
+- Analizar tendencias históricas
+- Explicar los factores que influyen en el riesgo
+- Simular escenarios de cambio (clima o casos)
+
+---
+
+## Problema
+
+El dengue es una enfermedad vectorial con alta incidencia en Ecuador.
+
+Según reportes oficiales:
+
+- 2023: 27.838 casos
+- 2024: 61.352 casos
+- 2025 (SE 15): 15.814 casos
+
+Esto evidencia la necesidad de herramientas que permitan anticipar brotes y apoyar decisiones de salud pública.
+
+---
+
+## Solución
+
+Se propone un sistema de predicción basado en machine learning que:
+
+1. Integra datos históricos por provincia y semana epidemiológica
+2. Considera variables climáticas (temperatura, precipitación)
+3. Genera un modelo de clasificación de riesgo
+4. Expone resultados a través de una API
+5. Visualiza resultados en una interfaz web interactiva
+
+---
+
+## Uso de Inteligencia Artificial
+
+El sistema utiliza un modelo de clasificación entrenado con:
+
+- Casos históricos de dengue
+- Variables climáticas sintéticas/proxy
+- Transformaciones temporales (estacionalidad)
+
+Modelo:
+- Random Forest Classifier (scikit-learn)
+
+Salidas del modelo:
+- Nivel de riesgo: bajo / medio / alto
+- Probabilidad por clase
+- Score de riesgo
+
+Explicabilidad:
+- Importancia de variables (feature importance)
+- Factores clave que influyen en la predicción
+
+---
+
+## Arquitectura
+
+Frontend (Angular)
+        ↓
+Backend (Node.js + Express)
+        ↓
+Salidas del modelo (JSON)
+        ↑
+ML (Python + scikit-learn)
+
+---
+
+## Estructura del proyecto
+
+concurso/
 │
-└── frontend/            # Angular + TypeScript + shadcn/ui
-    └── src/
-        ├── app/
-        │   ├── components/  # Reusable components
-        │   ├── pages/       # Page components
-        │   ├── services/    # API services
-        │   ├── guards/      # Route guards
-        │   └── interfaces/  # TypeScript interfaces
-        ├── components/ui/   # shadcn/ui components
-        ├── assets/
-        └── environments/
-```
+├── backend/
+├── frontend-fixed/
+├── ml/
+└── README.md
 
-## Getting Started
+---
 
-### Backend Setup
+## Cómo ejecutar
 
-```bash
+### Backend
+
 cd backend
-npm install
-cp .env.example .env
-npm run dev
-```
+bun install
+bun run dev
 
-The backend will start on `http://localhost:3000`
+---
 
-### Frontend Setup
+### ML
 
-```bash
-cd frontend
-npm install
-npm install -D tailwindcss-animate
-npm start
-```
+cd ml
+python -m venv .venv
+pip install -r requirements.txt
+python train_model.py
 
-The frontend will start on `http://localhost:4200`
-
-## Available Scripts
-
-### Backend
-
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build TypeScript to JavaScript
-- `npm start` - Start production server
-- `npm test` - Run tests
+---
 
 ### Frontend
 
-- `npm start` - Start development server
-- `npm run build` - Build for production
-- `npm run watch` - Build in watch mode
-- `npm test` - Run unit tests
+cd frontend-fixed
+bun install
+bun run start
 
-## Technologies
+---
 
-### Backend
-- Node.js
-- Express
-- TypeScript
-- Helmet (security)
-- CORS
-- Morgan (logging)
-- Compression
+## API
 
-### Frontend
-- Angular 17
-- TypeScript
-- Tailwind CSS
-- shadcn/ui components
-- Angular CDK
-
-## shadcn/ui Components
-
-To add shadcn/ui components, run:
-
-```bash
-cd frontend
-npx shadcn@latest add [component-name]
-```
-
-Make sure your `components.json` is configured correctly for shadcn/ui.
-
-## Environment Variables
-
-### Backend (.env)
-- `PORT` - Server port (default: 3000)
-- `NODE_ENV` - Environment (development/production)
-- `DATABASE_URL` - Database connection string
-- `JWT_SECRET` - JWT secret key
-- `API_URL` - API base URL
-=======
-# concurso
-concurso
->>>>>>> 6b5086e4ae02d30e16bb97ce9444759cc07ae83f
+GET /api/model/prediction?province=GUAYAS&week=15
+GET /api/model/metrics
+GET /api/model/feature-importance
